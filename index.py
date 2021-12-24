@@ -15,7 +15,6 @@ from Parser import Parser1, Parser2
 from aip import AipOcr
 from requests.adapters import HTTPAdapter
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
@@ -58,8 +57,10 @@ class YQTB:
         self.workflowId = ''
         self.client = requests.session()
         self.client.trust_env = False
-        self.client.proxies = {'http': 'socks5://nat.opapa.top:9192',
-                               'https': 'socks5://nat.opapa.top:9192'}
+        self.client.proxies = {
+            'http': 'socks5://nat.opapa.top:9192',
+            'https': 'socks5://nat.opapa.top:9192'
+        }
         try:
             ip = self.client.get("http://ip-api.com/json/?lang=zh-CN").json()
             logger.info('连接到代理服务器')
@@ -96,24 +97,26 @@ class YQTB:
         self.client.headers = {
             'Proxy-Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, '
-                          'like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,'
-                      '*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'User-Agent':
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, '
+                'like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,'
+                '*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
         }
-    
+
     #新版教务系统需要加密
     def desEnc(self, data, firstKey, sencondKey, thirdKey):
         with open('./des.js', 'r', encoding='UTF-8') as file:
             js = file.read()
         des = execjs.compile(js)
-        return des.call('strEnc',data,firstKey,sencondKey,thirdKey)
-        
+        return des.call('strEnc', data, firstKey, sencondKey, thirdKey)
+
     # 登陆账号
     def login(self):
         logger.info('开始登陆')
-        res = self.client.get(url="http://yq.gzhu.edu.cn/", timeout=TIMEOUT)
+        res = self.client.get(url="https://yq.gzhu.edu.cn/", timeout=TIMEOUT)
         if res.status_code != 200:
             raise ConnectionError('无法连接到网站')
         soup = BeautifulSoup(res.text, "html.parser")
@@ -153,7 +156,9 @@ class YQTB:
     def prepare(self):
         logger.info("准备数据")
         res = self.client.get(
-            url="http://yqtb.gzhu.edu.cn/infoplus/form/XNYQSB/start?back=1&x_posted=true", timeout=TIMEOUT)
+            url=
+            "https://yqtb.gzhu.edu.cn/infoplus/form/XNYQSB/start?back=1&x_posted=true",
+            timeout=TIMEOUT)
         if res.status_code != 200:
             raise ConnectionError('无法连接到网站')
         soup = BeautifulSoup(res.content.decode('utf-8'), 'html.parser')
@@ -162,9 +167,9 @@ class YQTB:
         self.formUrl = res.url
         # 温馨提示
         if self.formStepId == '1':
-            self.workflowId = re.findall(
-                r"workflowId = \"(.*?)\"", res.content.decode('utf-8'))[0]
-            url = "http://yqtb.gzhu.edu.cn/infoplus/interface/preview"
+            self.workflowId = re.findall(r"workflowId = \"(.*?)\"",
+                                         res.content.decode('utf-8'))[0]
+            url = "https://yqtb.gzhu.edu.cn/infoplus/interface/preview"
             payload = {
                 'workflowId': self.workflowId,
                 'rand': random.uniform(300, 400),
@@ -172,25 +177,38 @@ class YQTB:
                 'csrfToken': self.csrfToken
             }
             headers = {
-                'Host': 'yqtb.gzhu.edu.cn',
-                'Content-Length': '123',
-                'Pragma': 'no-cache',
-                'Cache-Control': 'no-cache',
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'X-Requested-With': 'XMLHttpRequest',
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Origin': 'http://yqtb.gzhu.edu.cn',
-                'Referer': 'http://yqtb.gzhu.edu.cn/infoplus/form/XNYQSB/start?back=1&x_posted=true',
-                'Accept-Encoding': 'gzip, deflate',
-                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
-                'Connection': 'close'
+                'Host':
+                    'yqtb.gzhu.edu.cn',
+                'Content-Length':
+                    '123',
+                'Pragma':
+                    'no-cache',
+                'Cache-Control':
+                    'no-cache',
+                'Accept':
+                    'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With':
+                    'XMLHttpRequest',
+                'User-Agent':
+                    'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+                'Content-Type':
+                    'application/x-www-form-urlencoded; charset=UTF-8',
+                'Origin':
+                    'https://yqtb.gzhu.edu.cn',
+                'Referer':
+                    'https://yqtb.gzhu.edu.cn/infoplus/form/XNYQSB/start?back=1&x_posted=true',
+                'Accept-Encoding':
+                    'gzip, deflate',
+                'Accept-Language':
+                    'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
+                'Connection':
+                    'close'
             }
 
             res = self.client.post(url, headers=headers, data=payload)
             formData = Parser2(res.json()).get()
 
-            url = "http://yqtb.gzhu.edu.cn/infoplus/interface/start"
+            url = "https://yqtb.gzhu.edu.cn/infoplus/interface/start"
             payload = {
                 'idc': 'XNYQSB',
                 'release': '',
@@ -200,17 +218,28 @@ class YQTB:
                 'csrfToken': self.csrfToken
             }
             headers = {
-                'Host': 'yqtb.gzhu.edu.cn',
-                'Content-Length': '4202',
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'X-Requested-With': 'XMLHttpRequest',
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Origin': 'http://yqtb.gzhu.edu.cn',
-                'Referer': 'http://yqtb.gzhu.edu.cn/infoplus/form/XNYQSB/start?back=1&x_posted=true',
-                'Accept-Encoding': 'gzip, deflate',
-                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
-                'Connection': 'close'
+                'Host':
+                    'yqtb.gzhu.edu.cn',
+                'Content-Length':
+                    '4202',
+                'Accept':
+                    'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With':
+                    'XMLHttpRequest',
+                'User-Agent':
+                    'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+                'Content-Type':
+                    'application/x-www-form-urlencoded; charset=UTF-8',
+                'Origin':
+                    'https://yqtb.gzhu.edu.cn',
+                'Referer':
+                    'https://yqtb.gzhu.edu.cn/infoplus/form/XNYQSB/start?back=1&x_posted=true',
+                'Accept-Encoding':
+                    'gzip, deflate',
+                'Accept-Language':
+                    'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
+                'Connection':
+                    'close'
             }
 
             res = self.client.post(url, headers=headers, data=payload).json()
@@ -219,7 +248,8 @@ class YQTB:
                 return False
             else:
                 self.formStepId = re.findall(r"\d+", res['entities'][0])[0]
-                self.formUrl = "http://yqtb.gzhu.edu.cn/infoplus/form/{}/render?back=2".format(self.formStepId)
+                self.formUrl = "https://yqtb.gzhu.edu.cn/infoplus/form/{}/render?back=2".format(
+                    self.formStepId)
         post_data = {
             'stepId': self.formStepId,
             'instanceId': '',
@@ -230,19 +260,31 @@ class YQTB:
             'csrfToken': self.csrfToken
         }
         headers = {
-            'Host': 'yqtb.gzhu.edu.cn',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Origin': 'http://yqtb.gzhu.edu.cn',
-            'Referer': self.formUrl,
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
-            'Connection': 'close'
+            'Host':
+                'yqtb.gzhu.edu.cn',
+            'Accept':
+                'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With':
+                'XMLHttpRequest',
+            'User-Agent':
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+            'Content-Type':
+                'application/x-www-form-urlencoded; charset=UTF-8',
+            'Origin':
+                'https://yqtb.gzhu.edu.cn',
+            'Referer':
+                self.formUrl,
+            'Accept-Encoding':
+                'gzip, deflate',
+            'Accept-Language':
+                'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
+            'Connection':
+                'close'
         }
         res = self.client.post(
-            url="http://yqtb.gzhu.edu.cn/infoplus/interface/render", headers=headers, data=post_data)
+            url="https://yqtb.gzhu.edu.cn/infoplus/interface/render",
+            headers=headers,
+            data=post_data)
         self.getDatas = res.json()
         return True
 
@@ -258,16 +300,26 @@ class YQTB:
         formData[0]['fieldJKMsfwlm'] = '1'
         formData[0]['fieldCXXXsftjhb'] = '2'
         headers = {
-            'Host': 'yqtb.gzhu.edu.cn',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Origin': 'http://yqtb.gzhu.edu.cn',
-            'Referer': self.formUrl,
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
-            'Connection': 'close'
+            'Host':
+                'yqtb.gzhu.edu.cn',
+            'Accept':
+                'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With':
+                'XMLHttpRequest',
+            'User-Agent':
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+            'Content-Type':
+                'application/x-www-form-urlencoded; charset=UTF-8',
+            'Origin':
+                'https://yqtb.gzhu.edu.cn',
+            'Referer':
+                self.formUrl,
+            'Accept-Encoding':
+                'gzip, deflate',
+            'Accept-Language':
+                'zh-CN,zh;q=0.9,en;q=0.8,und;q=0.7',
+            'Connection':
+                'close'
         }
         post_data1 = {
             'stepId': self.formStepId,
@@ -293,10 +345,14 @@ class YQTB:
             'remark': ''
         }
 
-        res1 = self.client.post(url='http://yqtb.gzhu.edu.cn/infoplus/interface/listNextStepsUsers', headers=headers,
-                                data=post_data1)
-        res2 = self.client.post(url='http://yqtb.gzhu.edu.cn/infoplus/interface/doAction', headers=headers,
-                                data=post_data2)
+        res1 = self.client.post(
+            url='https://yqtb.gzhu.edu.cn/infoplus/interface/listNextStepsUsers',
+            headers=headers,
+            data=post_data1)
+        res2 = self.client.post(
+            url='https://yqtb.gzhu.edu.cn/infoplus/interface/doAction',
+            headers=headers,
+            data=post_data2)
 
         if res1.json()['errno'] or res2.json()['errno']:
             return False
@@ -324,8 +380,9 @@ class YQTB:
         }
         body = json.dumps(data).encode(encoding='utf-8')
         headers = {'Content-Type': 'application/json'}
-        response = json.dumps(requests.post(
-            url, data=body, headers=headers).json(), ensure_ascii=False)
+        response = json.dumps(requests.post(url, data=body,
+                                            headers=headers).json(),
+                              ensure_ascii=False)
         datas = json.loads(response)
         if datas['code'] == 200:
             logger.info('【Push+】发送通知消息成功')
